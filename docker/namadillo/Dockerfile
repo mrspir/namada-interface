@@ -23,20 +23,21 @@ RUN yarn wasm:build
 COPY ./apps/namadillo .
 RUN yarn && yarn build
 
-# Production stage
-FROM nginx:alpine
+# Production stage - using serve instead of nginx
+FROM node:18-alpine
 WORKDIR /app
 
-COPY --from=builder /app/apps/namadillo/dist /usr/share/nginx/html/
+# Install serve
+RUN npm install -g serve
 
-# Simple nginx config
-RUN echo 'server { \n\
-    listen 3020; \n\
-    location / { \n\
-        root /usr/share/nginx/html; \n\
-        try_files $uri $uri/ /index.html; \n\
-    } \n\
-}' > /etc/nginx/conf.d/default.conf
+# Copy built files
+COPY --from=builder /app/apps/namadillo/dist ./dist/
 
-COPY --chmod=0755 ./docker/namadillo/bootstrap_config.sh /docker-entrypoint.d/bootstrap_config.sh
-RUN chown nginx:nginx /docker-entrypoint.d/bootstrap_config.sh
+# Copy and setup config script
+COPY --chmod=0755 ./docker/namadillo/bootstrap_config.sh ./
+RUN ./bootstrap_config.sh
+
+EXPOSE 3020
+
+# Start serve
+CMD ["serve", "-s", "dist", "-l", "3020"]

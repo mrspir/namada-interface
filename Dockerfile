@@ -31,8 +31,9 @@ FROM nginx:alpine
 # Copy built files
 COPY --from=builder /app/apps/namadillo/dist /usr/share/nginx/html
 
-# Copy NGINX config
-COPY docker/namadillo-nginx.conf /etc/nginx/conf.d/default.conf
+# Nginx config
+RUN rm /etc/nginx/conf.d/default.conf
+COPY namadillo-nginx.conf /etc/nginx/conf.d/default.conf
 
 EXPOSE 80
 
