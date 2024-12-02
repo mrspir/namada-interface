@@ -1,5 +1,5 @@
 # Uncomment the following lines to define your default indexer and rpc urls
-indexer_url = "https://your-indexer-url"
-rpc_url = "https://your-rpc-url"
-masp_indexer_url = "https://your-masp-indexer-url"  # Optional
+indexer_url = "${INDEXER_URL}"
+rpc_url = "${NAMADA_INTERFACE_NAMADA_URL}"
+masp_indexer_url = "${MASP_INDEXER_URL}"  # Optional
 #localnet_enabled = false
