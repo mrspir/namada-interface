@@ -1,8 +1,9 @@
 import { ActionButton, Container, Input, Stack } from "@namada/components";
 import { indexerUrlAtom, updateIndexerUrlAtom } from "atoms/settings";
 import { useAtom, useAtomValue } from "jotai";
-import { useState } from "react";
+import React, { useState } from "react";
 import { DISCORD_URL } from "urls";
+import { Link } from "react-router-dom";
 
 export const Setup = (): JSX.Element => {
   const indexerUrl = useAtomValue(indexerUrlAtom);
@@ -23,7 +24,16 @@ export const Setup = (): JSX.Element => {
       header={
         <h1 className="text-xl text-center uppercase text-yellow font-medium mb-6">
           Namadillo <br />
-          Maintenance by <a href="https://originstake.com" target="_blank" rel="noreferrer">OriginStake</a>
+          <h3 className="text-base text-center uppercase text-yellow-500/80 font-medium mb-6">
+            Maintenance by{" "}
+            <Link 
+              to="https://originstake.com" 
+              target="_blank" 
+              rel="noreferrer"
+            >
+              OriginStake
+            </Link>
+          </h3>
         </h1>
       }
     >
