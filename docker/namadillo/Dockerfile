@@ -58,9 +58,11 @@ RUN npm install -g serve
 
 # Copy built files and config
 COPY --from=builder /app/apps/namadillo/dist ./dist/
+
+# Tạo config.toml trong thư mục dist
 COPY --chmod=0755 ./docker/namadillo/bootstrap_config.sh ./
 RUN mkdir -p ./dist && \
-    ./bootstrap_config.sh
+    CONFIG_PATH="./dist/config.toml" ./bootstrap_config.sh
 
 EXPOSE 3020
 

@@ -1,6 +1,6 @@
 #!/bin/sh
 
-CONFIG_PATH="/usr/share/nginx/html/config.toml"
+CONFIG_PATH="./dist/config.toml"
 
 # if the config.toml file doesn't exist, we create it and we try to populate it from environemnt variables
 # Otherwise we try to replace the settings from environemnt variables
@@ -28,4 +28,5 @@ else
         sed -r -i "s~#?masp_indexer_url = .*~masp_indexer_url = \"${MASP_INDEXER_URL}\"~g" $CONFIG_PATH
     fi
 fi
+
 cat $CONFIG_PATH
