@@ -22,7 +22,8 @@ export const Setup = (): JSX.Element => {
       className="text-white flex [&>div]:flex [&>div]:flex-col"
       header={
         <h1 className="text-xl text-center uppercase text-yellow font-medium mb-6">
-          Namadillo
+          Namadillo <br />
+          Maintenance by <a href="https://originstake.com" target="_blank" rel="noreferrer">OriginStake</a>
         </h1>
       }
     >
