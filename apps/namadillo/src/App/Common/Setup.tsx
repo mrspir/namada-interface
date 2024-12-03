@@ -22,18 +22,19 @@ export const Setup = (): JSX.Element => {
     <Container
       className="text-white flex [&>div]:flex [&>div]:flex-col"
       header={
-        <h1 className="text-xl text-center uppercase text-yellow font-medium mb-6">
+        <h1 className="text-xl text-center uppercase text-yellow font-medium mb-2">
           Namadillo <br />
-          <h3 className="text-base text-center uppercase text-yellow-500/80 font-medium mb-6">
+          <span className="text-sm text-center uppercase text-yellow-500/70 font-normal mt-2">
             Maintenance by{" "}
-            <Link 
-              to="https://originstake.com" 
-              target="_blank" 
+            <a 
+              href="https://originstake.com" 
+              target="_blank"
               rel="noreferrer"
+              className="hover:text-yellow-400 underline decoration-dotted transition-colors"
             >
               OriginStake
-            </Link>
-          </h3>
+            </a>
+          </span>
         </h1>
       }
     >
