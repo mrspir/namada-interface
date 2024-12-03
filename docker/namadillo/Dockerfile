@@ -4,6 +4,11 @@ ARG BUILDKIT_INLINE_CACHE=1
 # Tách phần install dependencies
 FROM rust:1.79 AS deps
 WORKDIR /app
+
+# Cài đặt nodejs và yarn trước
+RUN apt update && apt install -y nodejs npm && \
+    npm install -g yarn
+
 COPY package.json yarn.lock ./
 COPY apps/namadillo/package.json ./apps/namadillo/
 COPY packages/sdk/package.json ./packages/sdk/
@@ -12,6 +17,7 @@ RUN yarn install
 # Build stage
 FROM rust:1.79 AS builder
 WORKDIR /app
+
 # Copy deps từ stage trước
 COPY --from=deps /app/node_modules ./node_modules
 
