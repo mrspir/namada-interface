@@ -5,11 +5,15 @@ ARG BUILDKIT_INLINE_CACHE=1
 FROM rust:1.79 AS deps
 WORKDIR /app
 
-# Cài đặt nodejs và yarn trước
+# Cài đặt nodejs và corepack
 RUN apt update && apt install -y nodejs npm && \
-    npm install -g yarn
+    npm install -g corepack && \
+    corepack enable && \
+    corepack prepare yarn@4.0.2 --activate
 
 COPY package.json yarn.lock ./
+COPY .yarnrc.yml ./
+COPY .yarn ./.yarn/
 COPY apps/namadillo/package.json ./apps/namadillo/
 COPY packages/sdk/package.json ./packages/sdk/
 RUN yarn install
@@ -21,8 +25,10 @@ WORKDIR /app
 # Copy deps từ stage trước
 COPY --from=deps /app/node_modules ./node_modules
 
-RUN apt update && apt install -y nodejs npm clang pkg-config libssl-dev protobuf-compiler curl
-RUN npm install -g yarn
+RUN apt update && apt install -y nodejs npm clang pkg-config libssl-dev protobuf-compiler curl && \
+    npm install -g corepack && \
+    corepack enable && \
+    corepack prepare yarn@4.0.2 --activate
 
 RUN rustup target add wasm32-unknown-unknown
 RUN curl https://rustwasm.github.io/wasm-pack/installer/init.sh -sSf | sh -s -- -y
