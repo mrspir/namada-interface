@@ -6,10 +6,11 @@ import BigNumber from "bignumber.js";
 import { useMemo, useState } from "react";
 import {
   Address,
-  AddressWithAssetAndAmount,
   AddressWithAssetAndAmountMap,
+  GasConfig,
   WalletProvider,
 } from "types";
+import { getDisplayGasFee } from "utils/gas";
 import { parseChainInfo } from "./common";
 import { IbcChannels } from "./IbcChannels";
 import { SelectAssetModal } from "./SelectAssetModal";
@@ -18,8 +19,6 @@ import { SelectWalletModal } from "./SelectWalletModal";
 import { TransferArrow } from "./TransferArrow";
 import { TransferDestination } from "./TransferDestination";
 import { TransferSource } from "./TransferSource";
-
-export type TransactionFee = AddressWithAssetAndAmount;
 
 type TransferModuleConfig = {
   wallet?: WalletProvider;
@@ -67,7 +66,8 @@ export type OnSubmitTransferParams = {
 export type TransferModuleProps = {
   source: TransferSourceProps;
   destination: TransferDestinationProps;
-  transactionFee?: TransactionFee;
+  requiresIbcChannels?: boolean;
+  gasConfig?: GasConfig;
   isSubmitting?: boolean;
   errorMessage?: string;
   onSubmitTransfer: (params: OnSubmitTransferParams) => void;
@@ -90,10 +90,11 @@ type ValidationResult =
 export const TransferModule = ({
   source,
   destination,
-  transactionFee,
+  gasConfig,
   isSubmitting,
   isIbcTransfer,
   ibcOptions,
+  requiresIbcChannels,
   onSubmitTransfer,
   errorMessage,
 }: TransferModuleProps): JSX.Element => {
@@ -106,17 +107,12 @@ export const TransferModule = ({
     destination.enableCustomAddress && !destination.availableWallets
   );
 
-  const [memo, setMemo] = useState<undefined | string>("");
+  const [memo, setMemo] = useState<undefined | string>();
 
   const selectedAsset = mapUndefined(
     (address) => source.availableAssets?.[address],
     source.selectedAssetAddress
   );
-
-  const requiresIbcChannels =
-    isIbcTransfer &&
-    (!ibcOptions?.sourceChannel ||
-      (destination.isShielded && !ibcOptions.destinationChannel));
 
   const availableAmountMinusFees = useMemo(() => {
     const { selectedAssetAddress, availableAmount } = source;
@@ -128,16 +124,14 @@ export const TransferModule = ({
       return undefined;
     }
 
-    const minusFees =
-      (
-        transactionFee &&
-        selectedAssetAddress === transactionFee.originalAddress
-      ) ?
-        availableAmount.minus(transactionFee.amount)
-      : availableAmount;
+    if (!gasConfig || gasConfig.gasToken !== selectedAssetAddress) {
+      return availableAmount;
+    }
 
-    return BigNumber.max(minusFees, 0);
-  }, [source.selectedAssetAddress, source.availableAmount, transactionFee]);
+    const totalFees = getDisplayGasFee(gasConfig);
+    const amountMinusFees = availableAmount.minus(totalFees);
+    return BigNumber.max(amountMinusFees, 0);
+  }, [source.selectedAssetAddress, source.availableAmount, gasConfig]);
 
   const validationResult = useMemo((): ValidationResult => {
     if (!source.wallet) {
@@ -150,7 +144,7 @@ export const TransferModule = ({
       return "NoSelectedAsset";
     } else if (!source.amount || source.amount.eq(0)) {
       return "NoAmount";
-    } else if (!transactionFee) {
+    } else if (!gasConfig) {
       return "NoTransactionFee";
     } else if (
       !availableAmountMinusFees ||
@@ -162,7 +156,7 @@ export const TransferModule = ({
     } else {
       return "Ok";
     }
-  }, [source, destination, transactionFee, availableAmountMinusFees]);
+  }, [source, destination, gasConfig, availableAmountMinusFees]);
 
   const onSubmit = (e: React.FormEvent): void => {
     e.preventDefault();
@@ -264,6 +258,9 @@ export const TransferModule = ({
     return "Submit";
   };
 
+  const buttonColor =
+    destination.isShielded || source.isShielded ? "yellow" : "white";
+
   return (
     <>
       <section className="max-w-[480px] mx-auto" role="widget">
@@ -318,7 +315,7 @@ export const TransferModule = ({
             onChangeAddress={destination.onChangeCustomAddress}
             memo={memo}
             onChangeMemo={setMemo}
-            transactionFee={transactionFee}
+            gasConfig={gasConfig}
           />
           {isIbcTransfer && requiresIbcChannels && (
             <IbcChannels
@@ -331,9 +328,11 @@ export const TransferModule = ({
           )}
           <InlineError errorMessage={errorMessage} />
           <ActionButton
-            backgroundColor={
-              destination.isShielded || source.isShielded ? "yellow" : "white"
-            }
+            outlineColor={buttonColor}
+            backgroundColor={buttonColor}
+            backgroundHoverColor="transparent"
+            textColor="black"
+            textHoverColor={buttonColor}
             disabled={validationResult !== "Ok" || isSubmitting}
           >
             {getButtonText()}
@@ -364,23 +363,19 @@ export const TransferModule = ({
           />
         )}
 
-      {sourceChainModalOpen &&
-        source.onChangeChain &&
-        source.wallet &&
-        source.walletAddress && (
-          <SelectChainModal
-            onClose={() => setSourceChainModalOpen(false)}
-            chains={source.availableChains || []}
-            onSelect={source.onChangeChain}
-            wallet={source.wallet}
-            walletAddress={source.walletAddress}
-          />
-        )}
+      {sourceChainModalOpen && source.onChangeChain && source.wallet && (
+        <SelectChainModal
+          onClose={() => setSourceChainModalOpen(false)}
+          chains={source.availableChains || []}
+          onSelect={source.onChangeChain}
+          wallet={source.wallet}
+          walletAddress={source.walletAddress}
+        />
+      )}
 
       {destinationChainModalOpen &&
         destination.onChangeChain &&
-        destination.wallet &&
-        destination.walletAddress && (
+        destination.wallet && (
           <SelectChainModal
             onClose={() => setDestinationChainModalOpen(false)}
             chains={destination.availableChains || []}

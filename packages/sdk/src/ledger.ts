@@ -180,7 +180,7 @@ export class Ledger {
           nsk: nsk?.toString(),
         },
       };
-    } catch (e) {
+    } catch (_) {
       throw new Error(`Could not retrieve Viewing Key`);
     }
   }
@@ -200,23 +200,6 @@ export class Ledger {
     const buffer = Buffer.from(tx);
 
     return await this.namadaApp.sign(path, buffer);
-  }
-
-  /**
-   * Sign a Masp tx with the shielded keys associated with the provided (or default) path.
-   * Throw exception if app is not initialized.
-   * @async
-   * @param tx - masp tx data blob to sign
-   * @param [path] Bip44 path for signing account
-   * @returns Response signature
-   */
-  public async signMasp(
-    tx: Uint8Array,
-    path: string = DEFAULT_LEDGER_BIP44_PATH
-  ): Promise<ResponseSign> {
-    const buffer = Buffer.from(tx);
-
-    return await this.namadaApp.signMasp(path, buffer);
   }
 
   /**

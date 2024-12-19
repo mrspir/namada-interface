@@ -1,8 +1,55 @@
 # NOTICE FOR FIREFOX ADD-ON REVIEWERS
 
-This is the monorepo which contains the source code for Namada Extension.
+This is the monorepo which contains the source code for Namada Extension. Please follow the instructions
+exactly as they are described below.
 
-## Source code
+## Table of Contents
+
+- [Build Instructions](#build-instructions)
+- [Notes](#notes)
+  - [Installing Docker](#installing-docker)
+  - [Source Code](#source-code)
+
+## Build instructions
+
+**NOTE** The add-on submission was built in the following environment:
+
+- Ubuntu Server 24.04 LTS **x86_64** - Please ensure your environment matches this to produce an identical build!
+- Docker version 27.x
+
+Follow these instructions to build with Docker:
+
+1. Verify that Docker 27+ is installed in your system before proceeding with the build:
+
+```bash
+docker --version
+```
+
+2. From the **source code root**, build the Docker image:
+
+```bash
+docker build . --target firefox -t namada-keychain-firefox -f docker/extension/Dockerfile
+```
+
+3. Wait for the build to complete, and then copy the files from the container by executing the following command in the **source code root**:
+
+```bash
+docker run --rm -v ./apps/extension/build:/shared namada-keychain-firefox cp -r /app/apps/extension/build/. /shared/
+```
+
+4. The resulting extension is the ZIP file in `apps/extension/build/firefox`.
+
+[ [Table of Contents](#table-of-contents) ]
+
+## Notes
+
+### Installing Docker
+
+If Docker is not currently installed in your environment, please refer to the [instructions of the official Docker documentation](https://docs.docker.com/engine/install/ubuntu/).
+
+[ [Table of Contents](#table-of-contents) ]
+
+### Source code
 
 The main extension source code is located in `apps/extension/src`. We also use
 several local packages; their sources are in:
@@ -19,43 +66,4 @@ several local packages; their sources are in:
 - `packages/crypto/lib` (crypto package Rust code compiled to WebAssembly)
 - `packages/crypto/src` (crypto package TypeScript glue code)
 
-## Build instructions
-
-If you don't already have Node v20 LTS and NPM v10, install now via `nvm`:
-
-```bash
-wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.1/install.sh | bash
-
-# Enable nvm in current shell
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-
-# Install v20 LTS
-nvm install v20.9.0
-```
-
-These instructions should work for the default reviewer build environment.
-
-```bash
-sudo apt install protobuf-compiler build-essential curl pkg-config libssl-dev binaryen
-curl https://sh.rustup.rs -sSf | sh
-
-# Proceed with standard installation when prompted
-
-# Make sure to pull cargo into your current environment:
-. "$HOME/.cargo/env"
-
-npm install -g yarn
-export PUPPETEER_SKIP_DOWNLOAD=true
-yarn
-cd apps/extension
-yarn wasm:build
-```
-
-Then, issue the final build command for the Firefox add-on:
-
-```bash
-yarn build:firefox
-```
-
-The resulting extension is the ZIP file in `apps/extension/build/firefox`.
+[ [Table of Contents](#table-of-contents) ]

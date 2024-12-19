@@ -1,12 +1,13 @@
 import { Chain } from "@chain-registry/types";
 import { OfflineSigner } from "@cosmjs/launchpad";
-import { coins } from "@cosmjs/proto-signing";
 import {
   DeliverTxResponse,
   SigningStargateClient,
   StargateClient,
+  StdFee,
+  assertIsDeliverTxSuccess,
+  calculateFee,
 } from "@cosmjs/stargate";
-import { TransactionFee } from "App/Transfer/TransferModule";
 import { queryForAck, queryForIbcTimeout } from "atoms/transactions";
 import BigNumber from "bignumber.js";
 import { getDefaultStore } from "jotai";
@@ -15,6 +16,7 @@ import toml from "toml";
 import {
   AddressWithAsset,
   Coin,
+  GasConfig,
   IbcTransferTransactionData,
   LocalnetToml,
   TransferStep,
@@ -32,7 +34,7 @@ type CommonParams = {
   amount: BigNumber;
   asset: AddressWithAsset;
   sourceChannelId: string;
-  transactionFee: TransactionFee;
+  gasConfig: GasConfig;
 };
 
 type TransparentParams = CommonParams & { isShielded: false };
@@ -91,7 +93,7 @@ export const submitIbcTransfer = async (
     asset,
     sourceChannelId,
     isShielded,
-    transactionFee,
+    gasConfig,
   } = transferParams;
 
   const client = await SigningStargateClient.connectWithSigner(rpc, signer, {
@@ -101,12 +103,11 @@ export const submitIbcTransfer = async (
 
   // cosmjs expects amounts to be represented in the base denom, so convert
   const baseAmount = toBaseAmount(asset.asset, displayAmount);
-  const baseFee = toBaseAmount(transactionFee.asset, transactionFee.amount);
 
-  const fee = {
-    amount: coins(baseFee.toString(), transactionFee.originalAddress),
-    gas: "222000", // TODO: what should this be?
-  };
+  const fee: StdFee = calculateFee(
+    gasConfig.gasLimit.toNumber(),
+    `${gasConfig.gasPrice.toString()}${gasConfig.gasToken}`
+  );
 
   const token = asset.originalAddress;
   const { receiver, memo }: { receiver: string; memo?: string } =
@@ -134,10 +135,7 @@ export const submitIbcTransfer = async (
     fee
   );
 
-  if (response.code !== 0) {
-    throw new Error(response.code + " " + response.transactionHash);
-  }
-
+  assertIsDeliverTxSuccess(response);
   return response;
 };
 

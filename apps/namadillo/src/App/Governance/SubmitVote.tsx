@@ -12,7 +12,7 @@ import {
   isVoteType,
   voteTypes,
 } from "@namada/types";
-import { TransactionFees } from "App/Common/TransactionFees";
+import { TransactionFeeButton } from "App/Common/TransactionFeeButton";
 import { defaultGasConfigFamily } from "atoms/fees";
 import {
   createNotificationId,
@@ -29,14 +29,12 @@ import { IoClose } from "react-icons/io5";
 import { useNavigate } from "react-router-dom";
 
 const dispatchVoteTx = (tx: TransactionPair<VoteProposalProps>): void => {
-  tx.signedTxs.forEach((signedTx) => {
-    broadcastTx(
-      tx.encodedTxData,
-      signedTx,
-      tx.encodedTxData.meta?.props,
-      "VoteProposal"
-    );
-  });
+  broadcastTx(
+    tx.encodedTxData,
+    tx.signedTxs,
+    tx.encodedTxData.meta?.props,
+    "VoteProposal"
+  );
 };
 
 export const SubmitVote: React.FC = () => {
@@ -183,10 +181,9 @@ export const WithProposalId: React.FC<{ proposalId: bigint }> = ({
             </Stack>
             <footer>
               {gasConfig.isSuccess && (
-                <TransactionFees
-                  className="flex justify-between"
-                  gasConfig={gasConfig.data}
-                />
+                <div className="justify-self-end">
+                  <TransactionFeeButton gasConfig={gasConfig.data} />
+                </div>
               )}
             </footer>
             <ActionButton

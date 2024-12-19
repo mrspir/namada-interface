@@ -28,32 +28,31 @@ import {
   LocalnetToml,
 } from "types";
 import { toBaseAmount, toDisplayAmount } from "utils";
+import { unknownAsset } from "utils/assets";
 import { getSdkInstance } from "utils/sdk";
 
-import dryrunAssets from "namada-chain-registry/namadadryrun/assetlist.json";
-import dryrunChain from "namada-chain-registry/namadadryrun/chain.json";
-import housefireAssets from "namada-chain-registry/namadahousefire/assetlist.json";
-import housefireChain from "namada-chain-registry/namadahousefire/chain.json";
-import internalDevnetAssets from "namada-chain-registry/namadainternaldevnet/assetlist.json";
-import internalDevnetChain from "namada-chain-registry/namadainternaldevnet/chain.json";
+import housefireAssets from "namada-chain-registry/_testnets/namadahousefire/assetlist.json";
+import housefireChain from "namada-chain-registry/_testnets/namadahousefire/chain.json";
+import internalDevnetAssets from "namada-chain-registry/_testnets/namadainternaldevnet/assetlist.json";
+import internalDevnetChain from "namada-chain-registry/_testnets/namadainternaldevnet/chain.json";
+import namadaAssets from "namada-chain-registry/namada/assetlist.json";
+import namadaChain from "namada-chain-registry/namada/chain.json";
 
-import dryrunOsmosis from "namada-chain-registry/_IBC/namadadryrun-osmosis.json";
-import housefireCosmosTestnetIbc from "namada-chain-registry/_IBC/namadahousefire-cosmoshubtestnet.json";
-import housefireOsmosisTestnetIbc from "namada-chain-registry/_IBC/namadahousefire-osmosistestnet.json";
-import internalDevnetCosmosTestnetIbc from "namada-chain-registry/_IBC/namadainternaldevnet-cosmoshubtestnet.json";
+import housefireCosmosTestnetIbc from "namada-chain-registry/_testnets/_IBC/namadahousefire-cosmoshubtestnet.json";
+import housefireOsmosisTestnetIbc from "namada-chain-registry/_testnets/_IBC/namadahousefire-osmosistestnet.json";
+import internalDevnetCosmosTestnetIbc from "namada-chain-registry/_testnets/_IBC/namadainternaldevnet-cosmoshubtestnet.json";
 
 // TODO: this causes a big increase on bundle size. See #1224.
 import cosmosRegistry from "chain-registry";
 
-cosmosRegistry.chains.push(internalDevnetChain, housefireChain, dryrunChain);
+cosmosRegistry.chains.push(internalDevnetChain, housefireChain, namadaChain);
 
-cosmosRegistry.assets.push(internalDevnetAssets, housefireAssets, dryrunAssets);
+cosmosRegistry.assets.push(internalDevnetAssets, housefireAssets, namadaAssets);
 
 cosmosRegistry.ibc.push(
   internalDevnetCosmosTestnetIbc,
   housefireCosmosTestnetIbc,
-  housefireOsmosisTestnetIbc,
-  dryrunOsmosis
+  housefireOsmosisTestnetIbc
 );
 
 const mainnetChains: ChainRegistryEntry[] = [
@@ -170,6 +169,15 @@ const tryDenomToIbcAsset = async (
 
   const { path, baseDenom } = denomTrace;
 
+  const assetOnRegistry = tryDenomToRegistryAsset(
+    baseDenom,
+    cosmosRegistry.assets.map((assetListEl) => assetListEl.assets).flat()
+  );
+
+  if (assetOnRegistry) {
+    return assetOnRegistry;
+  }
+
   // denom trace path may be something like...
   // transfer/channel-16/transfer/channel-4353
   // ...so from here walk the path to find the original chain
@@ -206,57 +214,61 @@ const tryDenomToIbcAsset = async (
   return originalChainRegistryAsset || unknownAsset(path + "/" + baseDenom);
 };
 
-const unknownAsset = (denom: string): Asset => ({
-  denom_units: [
-    {
-      denom,
-      exponent: 0,
-    },
-  ],
-  base: denom,
-  name: denom,
-  display: denom,
-  symbol: denom,
-});
+const findOriginalAsset = async (
+  coin: Coin,
+  assets: Asset[],
+  ibcAddressToDenomTrace: (address: string) => Promise<DenomTrace | undefined>,
+  chainName?: string
+): Promise<AddressWithAssetAndAmount> => {
+  const { minDenomAmount, denom } = coin;
+  let asset;
+
+  if (assets) {
+    asset = tryDenomToRegistryAsset(denom, assets);
+  }
+
+  if (!asset && chainName) {
+    asset = await tryDenomToIbcAsset(denom, ibcAddressToDenomTrace, chainName);
+  }
+
+  if (!asset) {
+    asset = unknownAsset(denom);
+  }
+
+  const baseBalance = BigNumber(minDenomAmount);
+  if (baseBalance.isNaN()) {
+    throw new Error(`Invalid balance: ${minDenomAmount}`);
+  }
+
+  const displayBalance = toDisplayAmount(asset, baseBalance);
+  return {
+    originalAddress: denom,
+    amount: displayBalance,
+    asset,
+  };
+};
+
+const findChainById = (chainId: string): Chain | undefined => {
+  return cosmosRegistry.chains.find((chain) => chain.chain_id === chainId);
+};
 
 export const mapCoinsToAssets = async (
   coins: Coin[],
   chainId: string,
   ibcAddressToDenomTrace: (address: string) => Promise<DenomTrace | undefined>
 ): Promise<AddressWithAssetAndAmountMap> => {
-  const chainName = cosmosRegistry.chains.find(
-    (chain) => chain.chain_id === chainId
-  )?.chain_name;
+  const chainName = findChainById(chainId)?.chain_name;
   const assets = mapUndefined(assetLookup, chainName);
-
   const results = await Promise.allSettled(
-    coins.map(async (coin: Coin): Promise<AddressWithAssetAndAmount> => {
-      const { minDenomAmount, denom } = coin;
-
-      const asset =
-        typeof chainName === "undefined" || typeof assets === "undefined" ?
-          unknownAsset(denom)
-        : tryDenomToRegistryAsset(denom, assets) ||
-          (await tryDenomToIbcAsset(
-            denom,
-            ibcAddressToDenomTrace,
-            chainName
-          )) ||
-          unknownAsset(denom);
-
-      const baseBalance = BigNumber(minDenomAmount);
-      if (baseBalance.isNaN()) {
-        throw new Error(`Balance is invalid, got ${minDenomAmount}`);
-      }
-      // We always represent amounts in their display denom, so convert here
-      const displayBalance = toDisplayAmount(asset, baseBalance);
-
-      return {
-        originalAddress: denom,
-        amount: displayBalance,
-        asset,
-      };
-    })
+    coins.map(
+      async (coin) =>
+        await findOriginalAsset(
+          coin,
+          assets || [],
+          ibcAddressToDenomTrace,
+          chainName
+        )
+    )
   );
 
   const successfulResults = results.reduce<AddressWithAssetAndAmount[]>(

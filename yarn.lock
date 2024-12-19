@@ -3233,6 +3233,18 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@ledgerhq/devices@npm:^8.4.4":
+  version: 8.4.4
+  resolution: "@ledgerhq/devices@npm:8.4.4"
+  dependencies:
+    "@ledgerhq/errors": "npm:^6.19.1"
+    "@ledgerhq/logs": "npm:^6.12.0"
+    rxjs: "npm:^7.8.1"
+    semver: "npm:^7.3.5"
+  checksum: ea4c3dada124c5c0aad59837e1c399bf2f41f8b4da5c996aaf73bbf8719082598808947c505dc728266ff83fc5fea71170d3f0d18a9b5d59e6e2737ae8a38f39
+  languageName: node
+  linkType: hard
+
 "@ledgerhq/errors@npm:^6.18.0":
   version: 6.18.0
   resolution: "@ledgerhq/errors@npm:6.18.0"
@@ -3240,31 +3252,38 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@ledgerhq/hw-transport-webhid@npm:^6.28.0":
-  version: 6.29.2
-  resolution: "@ledgerhq/hw-transport-webhid@npm:6.29.2"
-  dependencies:
-    "@ledgerhq/devices": "npm:^8.4.2"
-    "@ledgerhq/errors": "npm:^6.18.0"
-    "@ledgerhq/hw-transport": "npm:^6.31.2"
-    "@ledgerhq/logs": "npm:^6.12.0"
-  checksum: 86a610bf99eb44fbd93a7d0afc621f13a5f43e63fc86c64f686f88cc528d0ea62a51f674b8a6148aaa4330cc8ef2c2b2e461bbea5a71ae39305f82124a83377b
+"@ledgerhq/errors@npm:^6.19.1":
+  version: 6.19.1
+  resolution: "@ledgerhq/errors@npm:6.19.1"
+  checksum: 5cfbd5ff5e4316afc88c456a74d3dc0e0032dafd88f656e80a5cb5b297a75ba6701c53ce38ef3f38a84a8591c499b0b9248cdf352ff34c97a550440cdaddd8d2
   languageName: node
   linkType: hard
 
-"@ledgerhq/hw-transport-webusb@npm:^6.28.0":
-  version: 6.29.2
-  resolution: "@ledgerhq/hw-transport-webusb@npm:6.29.2"
+"@ledgerhq/hw-transport-webhid@npm:^6.29.4":
+  version: 6.29.4
+  resolution: "@ledgerhq/hw-transport-webhid@npm:6.29.4"
   dependencies:
-    "@ledgerhq/devices": "npm:^8.4.2"
-    "@ledgerhq/errors": "npm:^6.18.0"
-    "@ledgerhq/hw-transport": "npm:^6.31.2"
+    "@ledgerhq/devices": "npm:^8.4.4"
+    "@ledgerhq/errors": "npm:^6.19.1"
+    "@ledgerhq/hw-transport": "npm:^6.31.4"
     "@ledgerhq/logs": "npm:^6.12.0"
-  checksum: 6499398c90ccd1210d9a6b91846df49001b0de7b74a97a8df0020fc35f22b90f3b886499c5237cdf198e914a616f310ccd22238f5136df46699561f6dd2412ed
+  checksum: 85db88aa9c9ca4911645b9421e1a1ce828c48c32b03b7ed15caed8f8e24749dc31007540ec4f0088603d1a315274dbc06d30e4cb71c86b57160b721a664fc8dd
   languageName: node
   linkType: hard
 
-"@ledgerhq/hw-transport@npm:^6.30.0, @ledgerhq/hw-transport@npm:^6.30.6, @ledgerhq/hw-transport@npm:^6.31.2":
+"@ledgerhq/hw-transport-webusb@npm:^6.29.4":
+  version: 6.29.4
+  resolution: "@ledgerhq/hw-transport-webusb@npm:6.29.4"
+  dependencies:
+    "@ledgerhq/devices": "npm:^8.4.4"
+    "@ledgerhq/errors": "npm:^6.19.1"
+    "@ledgerhq/hw-transport": "npm:^6.31.4"
+    "@ledgerhq/logs": "npm:^6.12.0"
+  checksum: cddd324c12de64e755422c6dc0d509bc344f2f048c2b743bc5737db9c097ffb6c201fc577d971543e196ccb34a72507450ed3262a2b6d39c753424d299fafc2f
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport@npm:^6.30.6":
   version: 6.31.2
   resolution: "@ledgerhq/hw-transport@npm:6.31.2"
   dependencies:
@@ -3273,6 +3292,18 @@ __metadata:
     "@ledgerhq/logs": "npm:^6.12.0"
     events: "npm:^3.3.0"
   checksum: 3fc61c2e844639b7ec73e5eaec2f34235a414ec802df2491ea3d32d854f5f53c592b35b874a9ce899a6087a74a5a750b20c91aae19aaa44eea2faa390edf593f
+  languageName: node
+  linkType: hard
+
+"@ledgerhq/hw-transport@npm:^6.31.4":
+  version: 6.31.4
+  resolution: "@ledgerhq/hw-transport@npm:6.31.4"
+  dependencies:
+    "@ledgerhq/devices": "npm:^8.4.4"
+    "@ledgerhq/errors": "npm:^6.19.1"
+    "@ledgerhq/logs": "npm:^6.12.0"
+    events: "npm:^3.3.0"
+  checksum: 033acb802d991788efcda9223356528d0987a268e94c34cbafde499541722363e7cfa6e2734365ef3282c0a80a69f4964a6d728690ff7494662a650516530b02
   languageName: node
   linkType: hard
 
@@ -3441,9 +3472,9 @@ __metadata:
     "@babel/plugin-transform-modules-commonjs": "npm:^7.20.11"
     "@cosmjs/encoding": "npm:^0.29.0"
     "@dao-xyz/borsh": "npm:^5.1.5"
-    "@ledgerhq/hw-transport": "npm:^6.30.0"
-    "@ledgerhq/hw-transport-webhid": "npm:^6.28.0"
-    "@ledgerhq/hw-transport-webusb": "npm:^6.28.0"
+    "@ledgerhq/hw-transport": "npm:^6.31.4"
+    "@ledgerhq/hw-transport-webhid": "npm:^6.29.4"
+    "@ledgerhq/hw-transport-webusb": "npm:^6.29.4"
     "@svgr/webpack": "npm:^6.3.1"
     "@types/chrome": "npm:^0.0.237"
     "@types/dompurify": "npm:^3.0.5"
@@ -3471,6 +3502,7 @@ __metadata:
     eslint-plugin-react-hooks: "npm:^4.6.0"
     fake-indexeddb: "npm:^4.0.1"
     file-loader: "npm:^6.2.0"
+    fp-ts: "npm:^2.16.1"
     framer-motion: "npm:^11.3.28"
     io-ts: "npm:^2.2.21"
     jest: "npm:^29.7.0"
@@ -3581,12 +3613,12 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@namada/indexer-client@npm:0.0.31":
-  version: 0.0.31
-  resolution: "@namada/indexer-client@npm:0.0.31"
+"@namada/indexer-client@npm:1.0.2":
+  version: 1.0.2
+  resolution: "@namada/indexer-client@npm:1.0.2"
   dependencies:
     axios: "npm:^1.6.1"
-  checksum: 45bf4c05f590f3daee46aa217a5bcf7cd0ee08f3a0dcf8f6a89f8458786ffa99035d2cad8b87c7b28080aeca34e10cfd7b3eee905a2e26f740e43ca883c1252c
+  checksum: 536807e94c788c97e844c5153ddcc031ef80665867aee741df87622f4a9e39d8668909f66c88688cb37993ec7bf605bf97710bcb6bfb2597b7feda2c40dc6633
   languageName: node
   linkType: hard
 
@@ -3627,7 +3659,7 @@ __metadata:
     "@cosmjs/encoding": "npm:^0.32.3"
     "@eslint/js": "npm:^9.9.1"
     "@keplr-wallet/types": "npm:^0.12.136"
-    "@namada/indexer-client": "npm:0.0.31"
+    "@namada/indexer-client": "npm:1.0.2"
     "@playwright/test": "npm:^1.24.1"
     "@release-it/keep-a-changelog": "npm:^5.0.0"
     "@svgr/webpack": "npm:^6.5.1"
@@ -3718,13 +3750,13 @@ __metadata:
     "@babel/preset-typescript": "npm:^7.23.3"
     "@cosmjs/encoding": "npm:^0.29.0"
     "@dao-xyz/borsh": "npm:^5.1.5"
-    "@ledgerhq/hw-transport": "npm:^6.30.0"
-    "@ledgerhq/hw-transport-webhid": "npm:^6.28.0"
-    "@ledgerhq/hw-transport-webusb": "npm:^6.28.0"
+    "@ledgerhq/hw-transport": "npm:^6.31.4"
+    "@ledgerhq/hw-transport-webhid": "npm:^6.29.4"
+    "@ledgerhq/hw-transport-webusb": "npm:^6.29.4"
     "@release-it/conventional-changelog": "npm:^8.0.1"
     "@types/jest": "npm:^29.5.12"
     "@types/node": "npm:^20.11.4"
-    "@zondax/ledger-namada": "npm:^0.0.6"
+    "@zondax/ledger-namada": "npm:^1.0.0"
     babel-jest: "npm:^29.0.3"
     bignumber.js: "npm:^9.1.1"
     buffer: "npm:^6.0.3"
@@ -3796,7 +3828,18 @@ __metadata:
   languageName: unknown
   linkType: soft
 
-"@namada/types@npm:0.2.1, @namada/types@workspace:packages/types":
+"@namada/types@npm:0.2.1":
+  version: 0.2.1
+  resolution: "@namada/types@npm:0.2.1"
+  dependencies:
+    "@dao-xyz/borsh": "npm:^5.1.5"
+    bignumber.js: "npm:^9.1.1"
+    slip44: "npm:^3.0.11"
+  checksum: 33218d96948a08b6d51c851152272bec52479c56363f2d14813ab71300c46eb41059317add511afa0853cff1ad6b8f85ee0bc5f82a411a6ed421b4f40bafc057
+  languageName: node
+  linkType: hard
+
+"@namada/types@workspace:packages/types":
   version: 0.0.0-use.local
   resolution: "@namada/types@workspace:packages/types"
   dependencies:
@@ -6018,15 +6061,6 @@ __metadata:
   version: 4.2.2
   resolution: "@xtuc/long@npm:4.2.2"
   checksum: 8582cbc69c79ad2d31568c412129bf23d2b1210a1dfb60c82d5a1df93334da4ee51f3057051658569e2c196d8dc33bc05ae6b974a711d0d16e801e1d0647ccd1
-  languageName: node
-  linkType: hard
-
-"@zondax/ledger-namada@npm:^0.0.6":
-  version: 0.0.6
-  resolution: "@zondax/ledger-namada@npm:0.0.6"
-  dependencies:
-    "@ledgerhq/hw-transport": "npm:^6.30.6"
-  checksum: 39aabba4be347e5329413be53de82e6519ff9b8e44473d6753cd096b733d075891528d12353108bf653071cbcd6804a9b826703753061428a7f93861607bce80
   languageName: node
   linkType: hard
 
@@ -15827,8 +15861,8 @@ __metadata:
 
 "namada-chain-registry@https://github.com/anoma/namada-chain-registry":
   version: 0.0.1
-  resolution: "namada-chain-registry@https://github.com/anoma/namada-chain-registry.git#commit=aa3e4a524d4a8eed71c124272711de63bcded849"
-  checksum: 28855dec819a03d1d7411ccf0e878c4ce246abefa18caf768e4e1205f1f31aa89bc0daf2949e167055cea31afa09cf7b6f2f8a5340356d16339afcccbf81d8c5
+  resolution: "namada-chain-registry@https://github.com/anoma/namada-chain-registry.git#commit=698a9f0f8b21280ebac644781592af0a6ada6dc3"
+  checksum: 0979dadaabfd06e29a3045273b076bc79040eb122530d23995eb74b3ee993669a81217ed80c06186d9c85b0ae40c98f4ac8e128d51475e8125d0aa3bfddeec88
   languageName: node
   linkType: hard
 

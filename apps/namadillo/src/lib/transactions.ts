@@ -23,7 +23,7 @@ import {
   TransferStep,
   TransferTransactionData,
 } from "types";
-import { isNamadaAsset, toDisplayAmount } from "utils";
+import { toDisplayAmount } from "utils";
 import { TransactionPair } from "./query";
 
 export const getEventAttribute = (
@@ -85,7 +85,7 @@ export const createIbcTransferMessage = (
   receiverAddress: string,
   amount: BigNumber,
   token: string,
-  memo: string = ""
+  memo?: string
 ): MsgTransferEncodeObject => {
   const timeoutTimestampNanoseconds =
     BigInt(Math.floor(Date.now() / 1000) + 60) * BigInt(1_000_000_000);
@@ -167,7 +167,7 @@ export const createTransferDataFromNamada = (
     | TransactionPair<ShieldedTransferMsgValue>
     | TransactionPair<ShieldingTransferMsgValue>
     | TransactionPair<UnshieldingTransferMsgValue>,
-  memo = ""
+  memo?: string
 ): TransferTransactionData[] => {
   if (!txResponse?.encodedTxData?.txs?.length) {
     throw "Invalid transaction response";
@@ -191,10 +191,9 @@ export const createTransferDataFromNamada = (
           sourceAddress,
           destinationAddress,
           asset,
-          displayAmount:
-            isNamadaAsset(asset) ? amount : toDisplayAmount(asset, amount),
           memo,
           rpc: rpcUrl,
+          displayAmount: amount,
           chainId: txResponse?.encodedTxData.txs[0]?.args.chainId ?? "",
           hash: txResponse?.encodedTxData.txs[0].hash,
           feePaid: txResponse?.encodedTxData.txs[0].args.feeAmount,

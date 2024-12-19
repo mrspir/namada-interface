@@ -24,7 +24,6 @@ import { broadcastTx } from "lib/query";
 import { useEffect, useState } from "react";
 import namadaChainRegistry from "registry/namada.json";
 import { Address, PartialTransferTransactionData, TransferStep } from "types";
-import { namadaAsset } from "utils";
 import { IbcTopHeader } from "./IbcTopHeader";
 
 const defaultChainId = "cosmoshub-4";
@@ -51,15 +50,6 @@ export const IbcWithdraw: React.FC = () => {
 
   const { data: gasConfig } = useAtomValue(
     defaultGasConfigFamily(["IbcTransfer"])
-  );
-
-  const transactionFee = mapUndefined(
-    ({ gasLimit, gasPrice }) => ({
-      originalAddress: namadaAsset().address,
-      asset: namadaAsset(),
-      amount: gasPrice.multipliedBy(gasLimit),
-    }),
-    gasConfig
   );
 
   const {
@@ -135,15 +125,11 @@ export const IbcWithdraw: React.FC = () => {
       };
 
       setTransaction(tx);
-      await Promise.allSettled(
-        signedTxs.map((signedTx) => {
-          return broadcastTx(
-            encodedTxData,
-            signedTx,
-            encodedTxData.meta?.props,
-            "IbcTransfer"
-          );
-        })
+      await broadcastTx(
+        encodedTxData,
+        signedTxs,
+        encodedTxData.meta?.props,
+        "IbcTransfer"
       );
     } catch (err) {
       setGeneralErrorMessage(err + "");
@@ -154,6 +140,8 @@ export const IbcWithdraw: React.FC = () => {
   const onChangeChain = (chain: Chain): void => {
     connectToChainId(chain.chain_id);
   };
+
+  const requiresIbcChannels = !ibcChannels?.cosmosChannelId;
 
   return (
     <div className="relative min-h-[600px]">
@@ -187,7 +175,7 @@ export const IbcWithdraw: React.FC = () => {
             destination={{
               wallet: wallets.keplr,
               walletAddress: keplrAddress,
-              availableWallets: [wallets.keplr!],
+              availableWallets: [wallets.keplr],
               availableChains,
               enableCustomAddress: true,
               customAddress,
@@ -199,22 +187,19 @@ export const IbcWithdraw: React.FC = () => {
             }}
             isSubmitting={isPending}
             isIbcTransfer={true}
+            requiresIbcChannels={requiresIbcChannels}
             ibcOptions={{
               sourceChannel,
               onChangeSourceChannel: setSourceChannel,
             }}
             onSubmitTransfer={submitIbcTransfer}
-            transactionFee={transactionFee}
+            gasConfig={gasConfig}
             errorMessage={generalErrorMessage}
           />
         </>
       )}
       {transaction && (
-        <div
-          className={clsx(
-            "absolute z-50 py-12 left-0 top-0 w-full h-full bg-black"
-          )}
-        >
+        <div className={clsx("absolute z-50 py-12 left-0 top-0 w-full h-full")}>
           <TransferTransactionTimeline transaction={transaction} />
         </div>
       )}

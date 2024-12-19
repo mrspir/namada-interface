@@ -38,7 +38,7 @@ export const StakingRewardsPanel = (): JSX.Element => {
       mainAmount={
         <NamCurrency
           amount={availableRewards}
-          className="block leading-none"
+          className="block leading-none text-2xl"
           currencySymbolClassName="block mb-3 mt-0.5 text-sm"
           decimalPlaces={2}
         />
@@ -47,7 +47,11 @@ export const StakingRewardsPanel = (): JSX.Element => {
         <ActionButton
           className="px-8"
           size="xs"
+          outlineColor="white"
           backgroundColor="white"
+          backgroundHoverColor="transparent"
+          textColor="black"
+          textHoverColor="white"
           disabled={!claimRewardsEnabled || availableRewards.eq(0)}
           onClick={() =>
             navigate(routes.stakingClaimRewards, {

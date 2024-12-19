@@ -20,7 +20,7 @@ export const StakingSummary = (): JSX.Element => {
     bondedAmount,
     unbondedAmount,
     withdrawableAmount,
-    totalAmount,
+    totalTransparentAmount: totalAmount,
   } = useBalances();
 
   return (
@@ -68,7 +68,11 @@ export const StakingSummary = (): JSX.Element => {
               <ActionButton
                 className="px-8"
                 size="xs"
+                outlineColor="cyan"
                 backgroundColor="cyan"
+                backgroundHoverColor="transparent"
+                textColor="black"
+                textHoverColor="cyan"
                 href={routes.stakingBondingIncrement}
               >
                 Stake

@@ -106,7 +106,6 @@ const plugins = [
       env: JSON.stringify(
         getProcessEnv("NAMADA_INTERFACE", [
           "TARGET",
-          "REVISION",
           "NODE_ENV",
           "npm_package_version",
         ])
@@ -155,6 +154,8 @@ module.exports = {
     path: OUTPUT_PATH,
     //TODO: this might lead to problems with caching
     filename: "[name].namada.js",
+    chunkFilename: "[id].[contenthash].js",
+    hashFunction: "xxhash64",
   },
   module: {
     rules: [
@@ -162,7 +163,9 @@ module.exports = {
         test: /\.tsx?$/,
         loader: "ts-loader",
         exclude: /node_modules/,
-        options: {},
+        options: {
+          happyPackMode: false, // Ensure single-threaded processing
+        },
       },
       {
         test: /\.css$/i,
@@ -221,5 +224,10 @@ module.exports = {
   stats: {
     // We want to ignore wasm-bindgen-rayon circular dependency warning
     warningsFilter: [/dependency between chunks.+wasm-bindgen-rayon/],
+  },
+  optimization: {
+    minimize: false,
+    moduleIds: "deterministic", // Ensures consistent module IDs
+    chunkIds: "deterministic", // Ensures consistent chunk IDs
   },
 };

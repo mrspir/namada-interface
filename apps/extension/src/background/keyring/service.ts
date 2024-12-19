@@ -4,11 +4,13 @@ import {
   AccountType,
   Bip44Path,
   DerivedAccount,
+  GenDisposableSignerResponse,
   SignArbitraryResponse,
   TxProps,
 } from "@namada/types";
 import { Result, truncateInMiddle } from "@namada/utils";
 
+import { ApprovalErrors } from "background/approvals";
 import { ChainService } from "background/chain";
 import { SdkService } from "background/sdk/service";
 import { VaultService } from "background/vault";
@@ -42,7 +44,8 @@ export class KeyRingService {
       vaultService,
       vaultStorage,
       sdkService,
-      utilityStore
+      utilityStore,
+      localStorage
     );
   }
 
@@ -112,15 +115,24 @@ export class KeyRingService {
     return account;
   }
 
-  async queryAccountById(id: string): Promise<DerivedAccount[]> {
-    return await this._keyRing.queryAccountsById(id);
+  async queryAccountsByParentId(id: string): Promise<DerivedAccount[]> {
+    if (await this.vaultService.isLocked()) {
+      throw new Error(ApprovalErrors.KeychainLocked());
+    }
+    return await this._keyRing.queryAccountsByParentId(id);
   }
 
   async queryAccounts(): Promise<DerivedAccount[]> {
+    if (await this.vaultService.isLocked()) {
+      throw new Error(ApprovalErrors.KeychainLocked());
+    }
     return await this._keyRing.queryAllAccounts();
   }
 
   async queryDefaultAccount(): Promise<DerivedAccount | undefined> {
+    if (await this.vaultService.isLocked()) {
+      throw new Error(ApprovalErrors.KeychainLocked());
+    }
     return await this._keyRing.queryDefaultAccount();
   }
 
@@ -130,12 +142,21 @@ export class KeyRingService {
   }
 
   async queryParentAccounts(): Promise<DerivedAccount[]> {
+    if (await this.vaultService.isLocked()) {
+      throw new Error(ApprovalErrors.KeychainLocked());
+    }
+    if (await this.vaultService.isLocked()) {
+      return [];
+    }
     return [...(await this._keyRing.queryParentAccounts())];
   }
 
   async findParentByPublicKey(
     publicKey: string
   ): Promise<DerivedAccount | null> {
+    if (await this.vaultService.isLocked()) {
+      throw new Error(ApprovalErrors.KeychainLocked());
+    }
     const accounts = await this.vaultStorage.findAll(
       KeyStore,
       "publicKey",
@@ -205,6 +226,15 @@ export class KeyRingService {
   async queryAccountDetails(
     address: string
   ): Promise<DerivedAccount | undefined> {
+    if (await this.vaultService.isLocked()) {
+      throw new Error(ApprovalErrors.KeychainLocked());
+    }
     return this._keyRing.queryAccountDetails(address);
+  }
+
+  async genDisposableSigner(): Promise<
+    GenDisposableSignerResponse | undefined
+  > {
+    return this._keyRing.genDisposableSigner();
   }
 }
