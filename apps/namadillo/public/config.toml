@@ -3,3 +3,4 @@ indexer_url = "${INDEXER_URL}"
 rpc_url = "${NAMADA_INTERFACE_NAMADA_URL}"
 masp_indexer_url = "${MASP_INDEXER_URL}"  # Optional
 #localnet_enabled = false
+

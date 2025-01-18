@@ -68,6 +68,8 @@ export type TransferModuleProps = {
   destination: TransferDestinationProps;
   requiresIbcChannels?: boolean;
   gasConfig?: GasConfig;
+  changeFeeEnabled?: boolean;
+  submittingText?: string;
   isSubmitting?: boolean;
   errorMessage?: string;
   onSubmitTransfer: (params: OnSubmitTransferParams) => void;
@@ -91,6 +93,8 @@ export const TransferModule = ({
   source,
   destination,
   gasConfig,
+  changeFeeEnabled,
+  submittingText,
   isSubmitting,
   isIbcTransfer,
   ibcOptions,
@@ -208,16 +212,12 @@ export const TransferModule = ({
       return;
     }
 
-    // Don't need to show the modal, connects directly
-    if (!config.walletAddress && config.availableWallets.length === 1) {
-      config.onChangeWallet(config.availableWallets[0]);
-      return;
-    }
+    setWalletSelectorModalOpen(true);
   };
 
   const getButtonText = (): string => {
     if (isSubmitting) {
-      return "Submitting...";
+      return submittingText || "Submitting...";
     }
 
     if (validationResult === "NoSourceWallet") {
@@ -272,7 +272,8 @@ export const TransferModule = ({
             asset={selectedAsset?.asset}
             isLoadingAssets={source.isLoadingAssets}
             chain={parseChainInfo(source.chain, source.isShielded)}
-            availableAmount={availableAmountMinusFees}
+            availableAmount={source.availableAmount}
+            availableAmountMinusFees={availableAmountMinusFees}
             amount={source.amount}
             openProviderSelector={onChangeWallet(source)}
             openChainSelector={
@@ -316,6 +317,7 @@ export const TransferModule = ({
             memo={memo}
             onChangeMemo={setMemo}
             gasConfig={gasConfig}
+            changeFeeEnabled={changeFeeEnabled}
           />
           {isIbcTransfer && requiresIbcChannels && (
             <IbcChannels
